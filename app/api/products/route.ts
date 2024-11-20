@@ -1,15 +1,25 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { db } from "@/app/_lib/prisma";
 
-const dogs = [
-  { id: 1, name: "Bulldog", age: 5 },
-  { id: 2, name: "Beagle", age: 3 },
-  { id: 3, name: "Labrador", age: 4 },
-];
+// Apenas para referência
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === "GET") {
-    res.status(200).json(dogs);
-  } else {
-    res.status(405).end(); // Method Not Allowed
-  }
+export async function GET() {
+  const products = await db.product.findMany({});
+  return Response.json(products, {
+    status: 200,
+  });
+}
+
+export async function POST(request: Request) {
+  const body = await request.json();
+  const name = body.name;
+  const price = body.price;
+  const stock = body.stock;
+  await db.product.create({
+    data: {
+      name,
+      price,
+      stock,
+    },
+  });
+  return Response.json({}, { status: 201 });
 }
