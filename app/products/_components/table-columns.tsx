@@ -1,8 +1,9 @@
 "use client";
 
 import { Badge } from "@/app/_components/ui/badge";
-import { Product } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
+import ProductTableDropdownMenu from "./table-dropdown-menu";
+import { ProductDto } from "@/app/_data-access/product/get-products";
 
 const getStatusLabel = (status: string) => {
   if (status === "IN_STOCK") {
@@ -11,14 +12,21 @@ const getStatusLabel = (status: string) => {
   return "Fora de estoque";
 };
 
-export const productTableColumns: ColumnDef<Product>[] = [
+export const productTableColumns: ColumnDef<ProductDto>[] = [
   {
     accessorKey: "name",
-    header: "Producto",
+    header: "Produto",
   },
   {
     accessorKey: "price",
     header: "Valor unitário",
+    cell: (row) => {
+      const product = row.row.original;
+      return Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }).format(Number(product.price));
+    },
   },
   {
     accessorKey: "stock",
@@ -36,5 +44,10 @@ export const productTableColumns: ColumnDef<Product>[] = [
         </Badge>
       );
     },
+  },
+  {
+    accessorKey: "actions",
+    header: "Ações",
+    cell: (row) => <ProductTableDropdownMenu product={row.row.original} />,
   },
 ];
