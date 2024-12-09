@@ -3,12 +3,7 @@ interface Params {
 }
 
 const ProductDetailsPage = ({ params: { id } }: { params: Params }) => {
-  return (
-    <div>
-      <h1>Product Details</h1>
-      <p>Product ID: {id} </p>
-    </div>
-  );
+  return <h1>Product ID: {id}</h1>;
 };
 
 export default ProductDetailsPage;

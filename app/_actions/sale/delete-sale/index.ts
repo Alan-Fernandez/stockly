@@ -18,11 +18,22 @@ export const deleteSale = actionClient
         },
       });
       if (!sale) return;
+
+      // Eliminar los registros relacionados en SaleProduct
+      await trx.saleProduct.deleteMany({
+        where: {
+          saleId: id,
+        },
+      });
+
+      // Ahora puedes eliminar el registro en Sale
       await trx.sale.delete({
         where: {
           id,
         },
       });
+
+      // Actualizar el stock de los productos
       for (const product of sale.saleProducts) {
         await trx.product.update({
           where: {
