@@ -1,79 +1,69 @@
-import {
-    CircleDollarSign,
-    DollarSign,
-    PackageIcon,
-    ShoppingBasketIcon,
-} from 'lucide-react';
+import { Suspense } from 'react';
 import Header, { HeaderLeft, HeaderSubtitle, HeaderTitle } from '../_components/header';
-import SummaryCard, {
-    SummaryCardIcon,
-    SummaryCardTitle,
-    SummaryCardValue,
-} from './_components/sunnary-card';
-import { getDashboard } from '../_data-access/dashboard/get-dashboard';
-import { formatCurrency } from '../_helpers/currency';
-import RevenueChart from './_components/revenue-chart';
+import { SummaryCardSkeleton } from './_components/summary-card';
+import TotalRevenueCard from './_components/total-revenue-card';
+import TodayRevenueCard from './_components/today-revenue-card';
+import TotalSalesCard from './_components/total-sales-card';
+import TotalInStockCard from './_components/total-in-stock-card';
+import TotalProductsCard from './_components/total-products-card';
+import Last14DaysRevenueCard from './_components/last-14-days-revenue-card';
+import MostSoldProducts, {
+    MostSoldProductsSkeleton,
+} from './_components/most-sold-products';
+import { Skeleton } from '../_components/ui/skeleton';
 
-const DashboardPage = async () => {
-    const { totalProducts, totalSales, totalRevenue, totalStock, totayRevenue, totalLast14DaysRevenue } =
-        await getDashboard();
+// Essa página será montada do zero a cada acesso (SSR)
+export const dynamic = 'force-dynamic';
+
+const Home = async () => {
     return (
         <div className="m-8 flex w-full flex-col space-y-8 rounded-lg">
             <Header>
                 <HeaderLeft>
-                    <HeaderSubtitle>Deshboard</HeaderSubtitle>
-                    <HeaderTitle>Vendas</HeaderTitle>
+                    <HeaderSubtitle>Visão geral dos dados</HeaderSubtitle>
+                    <HeaderTitle>Dashboard</HeaderTitle>
                 </HeaderLeft>
             </Header>
-            <div className="grid grid-cols-2 gap-6">
-                <SummaryCard>
-                    <SummaryCardIcon>
-                        <DollarSign />
-                    </SummaryCardIcon>
-                    <SummaryCardTitle>Vendas</SummaryCardTitle>
-                    <SummaryCardValue>{formatCurrency(totalRevenue)}</SummaryCardValue>
-                </SummaryCard>
-                <SummaryCard>
-                    <SummaryCardIcon>
-                        <DollarSign />
-                    </SummaryCardIcon>
-                    <SummaryCardTitle>Vendas</SummaryCardTitle>
-                    <SummaryCardValue>{formatCurrency(totayRevenue)}</SummaryCardValue>
-                </SummaryCard>
-            </div>
-            <div className="grid grid-cols-2 gap-6">
-                <SummaryCard>
-                    <SummaryCardIcon>
-                        <CircleDollarSign />
-                    </SummaryCardIcon>
-                    <SummaryCardTitle>Vendas Totais</SummaryCardTitle>
-                    <SummaryCardValue>{totalSales}</SummaryCardValue>
-                </SummaryCard>
-                <SummaryCard>
-                    <SummaryCardIcon>
-                        <PackageIcon />
-                    </SummaryCardIcon>
-                    <SummaryCardTitle>Total em Estoque</SummaryCardTitle>
-                    <SummaryCardValue>{totalStock}</SummaryCardValue>
-                </SummaryCard>
-                <SummaryCard>
-                    <SummaryCardIcon>
-                        <ShoppingBasketIcon />
-                    </SummaryCardIcon>
-                    <SummaryCardTitle>Productos</SummaryCardTitle>
-                    <SummaryCardValue>{totalProducts}</SummaryCardValue>
-                </SummaryCard>
-            </div>
-            <div className="grid min-h-0 grid-cols-[minmax(0,2.5fr),minmax(0,1fr)] gap-6">
-                <p className="text-2x1 font-semibold text-slate-900">Receita</p>
-                <p className="text-sm text-slate-400">Últimos 14 dias</p>
 
-            <div className="h-64 w-full">
-                <RevenueChart data={totalLast14DaysRevenue} />
+            <div className="grid grid-cols-2 gap-6">
+                <Suspense fallback={<SummaryCardSkeleton />}>
+                    <TotalRevenueCard />
+                </Suspense>
+                <Suspense fallback={<SummaryCardSkeleton />}>
+                    <TodayRevenueCard />
+                </Suspense>
             </div>
+            <div className="grid grid-cols-3 gap-6">
+                <Suspense fallback={<SummaryCardSkeleton />}>
+                    <TotalSalesCard />
+                </Suspense>
+                <Suspense fallback={<SummaryCardSkeleton />}>
+                    <TotalInStockCard />
+                </Suspense>
+                <Suspense fallback={<SummaryCardSkeleton />}>
+                    <TotalProductsCard />
+                </Suspense>
+            </div>
+
+            <div className="grid min-h-0 grid-cols-[minmax(0,2.5fr),minmax(0,1fr)] gap-6">
+                <Suspense
+                    fallback={
+                        <Skeleton className="bg-white p-6">
+                            <div className="space-y-2">
+                                <div className="h-5 w-[86.26px] rounded-md bg-gray-200" />
+                                <div className="h-4 w-48 rounded-md bg-gray-200" />
+                            </div>
+                        </Skeleton>
+                    }
+                >
+                    <Last14DaysRevenueCard />
+                </Suspense>
+                <Suspense fallback={<MostSoldProductsSkeleton />}>
+                    <MostSoldProducts />
+                </Suspense>
             </div>
         </div>
     );
 };
 
-export default DashboardPage;
+export default Home;
